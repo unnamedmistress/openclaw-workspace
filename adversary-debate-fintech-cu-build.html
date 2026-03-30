@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red-Team: Fintech-CU Matchmaking App — Build</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    line-height: 1.6;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #0d1f0d 0%, #0a1a2e 50%, #0f2040 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-bottom: 3px solid #4ecdc4;
+  }
+  .header h1 { font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem; }
+  .header .subtitle { color: #a0a0b0; font-size: 1.1rem; }
+  .header .meta { color: #4ecdc4; font-size: 0.9rem; margin-top: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+  .header .scope-badge {
+    display: inline-block; margin-top: 1rem;
+    background: #1a3a1a; border: 1px solid #4ecdc4; color: #4ecdc4;
+    padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.85rem;
+  }
+
+  .nav { display: flex; justify-content: center; gap: 0.5rem; padding: 1rem; background: #111; flex-wrap: wrap; }
+  .nav button {
+    background: #1a1a2e; color: #a0a0b0; border: 1px solid #333;
+    padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer;
+    font-size: 0.9rem; transition: all 0.2s;
+  }
+  .nav button:hover, .nav button.active { background: #4ecdc4; color: #0a0a0f; border-color: #4ecdc4; }
+
+  .section { display: none; max-width: 960px; margin: 0 auto; padding: 2rem; }
+  .section.active { display: block; }
+
+  .expert-card {
+    background: #151525; border: 1px solid #252540; border-radius: 10px;
+    padding: 1.5rem; margin-bottom: 1.2rem; border-left: 4px solid var(--accent, #4ecdc4);
+  }
+  .expert-card h3 { color: var(--accent, #4ecdc4); margin-bottom: 0.3rem; font-size: 1.15rem; }
+  .expert-card .credentials { color: #888; font-size: 0.85rem; margin-bottom: 0.8rem; }
+  .expert-card .lens { color: #ccc; margin-bottom: 0.6rem; }
+  .expert-card .bias { color: #777; font-size: 0.85rem; font-style: italic; }
+
+  .round-intro {
+    background: #111120; border-radius: 8px; padding: 1rem 1.2rem;
+    margin-bottom: 1.5rem; color: #888; font-size: 0.9rem; border-left: 3px solid #333;
+  }
+
+  .critique {
+    background: #151525; border-radius: 8px; padding: 1.5rem;
+    margin-bottom: 1.2rem; border-left: 4px solid var(--accent, #4ecdc4);
+  }
+  .critique .speaker { font-weight: 700; color: var(--accent, #4ecdc4); font-size: 1rem; margin-bottom: 0.3rem; }
+  .critique .style-note { font-style: italic; color: #666; font-size: 0.8rem; margin-bottom: 0.8rem; }
+  .critique p { margin-bottom: 0.7rem; color: #ccc; }
+  .critique p:last-child { margin-bottom: 0; }
+  .critique code {
+    background: #1a1a2e; color: #4ecdc4; padding: 0.1rem 0.4rem;
+    border-radius: 3px; font-size: 0.85rem; font-family: 'Consolas', monospace;
+  }
+  .critique ul { margin: 0.5rem 0 0.7rem 1.2rem; color: #ccc; }
+  .critique ul li { margin-bottom: 0.3rem; }
+
+  .exchange {
+    background: #111120; border-radius: 8px; padding: 1.5rem;
+    margin-bottom: 1.2rem; border: 1px solid #252540;
+  }
+  .exchange .from-to { font-size: 0.75rem; color: #555; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+  .exchange .exchange-speaker { font-weight: 700; margin-bottom: 0.6rem; font-size: 1rem; }
+  .exchange p { color: #ccc; margin-bottom: 0.5rem; }
+  .exchange p:last-child { margin-bottom: 0; }
+  .exchange code {
+    background: #1a1a2e; color: #4ecdc4; padding: 0.1rem 0.4rem;
+    border-radius: 3px; font-size: 0.85rem; font-family: 'Consolas', monospace;
+  }
+
+  .steelman-block {
+    background: #101820; border: 1px solid #1a3040; border-radius: 8px;
+    padding: 1.5rem; margin-bottom: 1.2rem;
+  }
+  .steelman-block h4 { color: #60a5fa; margin-bottom: 0.8rem; }
+  .steelman-block p { color: #ccc; margin-bottom: 0.6rem; }
+  .rebuttal { border-top: 1px solid #1a3040; margin-top: 1rem; padding-top: 1rem; }
+  .rebuttal-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 0.5rem; }
+
+  .vulnerability {
+    background: #1a1020; border: 1px solid #3a2040; border-radius: 8px;
+    padding: 1.2rem; margin-bottom: 1rem;
+  }
+  .vulnerability h4 { color: #e0e0e0; margin: 0.4rem 0 0.6rem; }
+  .vulnerability p { color: #bbb; font-size: 0.95rem; }
+  .severity {
+    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px;
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  }
+  .severity.high { background: #e94560; color: #fff; }
+  .severity.medium { background: #f5a623; color: #000; }
+  .severity.low { background: #4ecdc4; color: #000; }
+
+  .recommendation {
+    background: #0d1f0d; border: 1px solid #1a3a1a; border-radius: 8px;
+    padding: 1.2rem; margin-bottom: 1rem;
+  }
+  .recommendation h4 { color: #4ecdc4; margin-bottom: 0.5rem; }
+  .recommendation p { color: #bbb; font-size: 0.95rem; margin-bottom: 0.4rem; }
+  .recommendation p:last-child { margin-bottom: 0; }
+  .recommendation code {
+    background: #0a150a; color: #4ecdc4; padding: 0.1rem 0.4rem;
+    border-radius: 3px; font-size: 0.85rem; font-family: 'Consolas', monospace;
+  }
+
+  .conflict {
+    background: #1a1525; border: 1px solid #302545; border-radius: 8px;
+    padding: 1.2rem; margin-bottom: 1rem;
+  }
+  .conflict h4 { color: #a78bfa; margin-bottom: 0.6rem; }
+  .vs { display: flex; gap: 1rem; margin-top: 0.8rem; flex-wrap: wrap; }
+  .vs > div { flex: 1; min-width: 240px; padding: 0.8rem; background: #151525; border-radius: 6px; font-size: 0.9rem; color: #ccc; }
+  .vs > div strong { display: block; margin-bottom: 0.3rem; }
+  .implication { margin-top: 0.8rem; color: #777; font-size: 0.9rem; font-style: italic; }
+
+  .residual {
+    background: #181810; border: 1px solid #303020; border-radius: 8px;
+    padding: 1.2rem; margin-bottom: 1rem;
+  }
+  .residual h4 { color: #f5a623; margin-bottom: 0.5rem; }
+  .residual p { color: #bbb; font-size: 0.95rem; }
+
+  .callout {
+    background: #0f1f10; border: 1px solid #2a4a2a; border-radius: 8px;
+    padding: 1rem 1.2rem; margin: 1rem 0; color: #ccc; font-size: 0.95rem;
+  }
+  .callout strong { color: #4ecdc4; }
+
+  .confidence-meter {
+    background: #151525; border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem; text-align: center;
+  }
+  .confidence-meter h3 { color: #fff; margin-bottom: 0.5rem; }
+  .confidence-meter .bar { height: 12px; border-radius: 6px; background: #252540; margin: 1rem auto; max-width: 400px; overflow: hidden; }
+  .confidence-meter .bar .fill { height: 100%; border-radius: 6px; }
+  .confidence-meter .label { color: #4ecdc4; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.4rem; }
+  .confidence-meter .details { color: #aaa; font-size: 0.85rem; margin-top: 0.4rem; }
+
+  .tag { display: inline-block; background: #1a2a1a; color: #4ecdc4; font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 3px; margin-right: 0.3rem; border: 1px solid #2a4a2a; }
+
+  .expert-1 { --accent: #4ecdc4; }
+  .expert-2 { --accent: #60a5fa; }
+  .expert-3 { --accent: #f5a623; }
+  .expert-4 { --accent: #a78bfa; }
+
+  h3.sh { margin: 1.5rem 0 1rem; }
+  h3.sh.teal { color: #4ecdc4; }
+  h3.sh.red { color: #e94560; }
+  h3.sh.purple { color: #a78bfa; }
+  h3.sh.orange { color: #f5a623; }
+  h3.sh.blue { color: #60a5fa; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="meta">Adversary Debate · Build Red-Team · March 30, 2026</div>
+  <h1>Red-Team: Fintech-CU Matchmaking App</h1>
+  <div class="subtitle">Stress-testing the algorithm spec, architecture, testing strategy, and operability of the build</div>
+  <div class="scope-badge">Scope: Build Only — Algorithm · Architecture · Testing · Operability</div>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="showSection('panel', this)">Expert Panel</button>
+  <button onclick="showSection('round1', this)">Round 1: Critiques</button>
+  <button onclick="showSection('round2', this)">Round 2: Cross-Exam</button>
+  <button onclick="showSection('round3', this)">Round 3: Steelman</button>
+  <button onclick="showSection('round4', this)">Round 4: Proposals</button>
+  <button onclick="showSection('synthesis', this)">Synthesis</button>
+</div>
+
+<!-- PANEL -->
+<div id="panel" class="section active">
+  <h2 style="color:#4ecdc4; margin-bottom:1.5rem;">Expert Panel</h2>
+  <p style="color:#888; margin-bottom:0.5rem;">Focused on the build: algorithm correctness, architecture choices, testing approach, and production operability.</p>
+  <div class="callout" style="margin-bottom:1.5rem;">
+    <strong>Context note:</strong> The organizer has indicated that fallback participants will be provided to ensure Fintech schedule fill when natural matches are exhausted. The panel will address how this changes the algorithm spec and what new questions it raises.
+  </div>
+
+  <div class="expert-card expert-1">
+    <h3>Martin Kleppmann</h3>
+    <div class="credentials">Distributed systems researcher · Author of <em>Designing Data-Intensive Applications</em> · Cambridge University</div>
+    <div class="lens">The "modified Gale-Shapley algorithm" is the core of the entire product — and it's described in two bullet points with no tiebreaker logic, no re-runnability specification, and no formal correctness criteria. Kleppmann will probe whether the algorithm spec is complete enough to implement correctly, and whether the testing strategy is sufficient to verify it.</div>
+    <div class="bias">Known bias: Can push for formal specification rigor that exceeds what practical event software requires; not every algorithm needs a proof to be production-ready.</div>
+  </div>
+
+  <div class="expert-card expert-2">
+    <h3>Kelsey Hightower</h3>
+    <div class="credentials">Former Principal Engineer at Google · Cloud-native advocate · Kubernetes contributor and educator</div>
+    <div class="lens">Will examine each technology choice against the actual operational profile of the application — a tool used by 200–500 participants a few times per year. TiDB (distributed SQL), an optional Python microservice, and Puppeteer (headless Chrome for PDFs) will each face the question: does this complexity exist to solve a real problem at this scale, or is it speculative infrastructure?</div>
+    <div class="bias">Known bias: The simplicity preference can underweight legitimate future-scale concerns; some architectural decisions are cheaper to make upfront than to retrofit later.</div>
+  </div>
+
+  <div class="expert-card expert-3">
+    <h3>Charity Majors</h3>
+    <div class="credentials">Co-founder & CTO of Honeycomb · Author of <em>Database Reliability Engineering</em> (with Laine Campbell) · Observability advocate</div>
+    <div class="lens">The PRD has no mention of logging, auditability, or observability for the matching algorithm. When a Fintech sponsor at a live event asks "why is this CU on my schedule?", there is currently no way to answer that question. Majors will argue that per-assignment decision logging is a Phase 1 operational requirement, not a Phase 2 analytics nice-to-have.</div>
+    <div class="bias">Known bias: Observability-first can feel like over-engineering for internal tooling; batch algorithms that run once and produce deterministic output may not need the same observability rigor as live production services.</div>
+  </div>
+
+  <div class="expert-card expert-4">
+    <h3>DHH (David Heinemeier Hansson)</h3>
+    <div class="credentials">Creator of Ruby on Rails · Co-founder of 37signals (Basecamp, HEY) · Co-author of <em>Rework</em></div>
+    <div class="lens">The PRD describes a distributed system — Node.js API + optional Python microservice + TiDB + Puppeteer — for a problem that has bounded scale (≤500 participants, ≤50 time slots, essentially zero concurrent users outside of event windows). DHH will argue this is a single-server problem being solved with distributed system complexity, and that a well-organized monolith with a background job handles the entire feature set with a fraction of the operational overhead.</div>
+    <div class="bias">Known bias: The monolith-first philosophy has well-known limits; the Cvent integration specifically may benefit from isolation as a separate service if Cvent's API has reliability issues.</div>
+  </div>
+</div>
+
+<!-- ROUND 1 -->
+<div id="round1" class="section">
+  <div class="round">
+    <h2>Round 1 — Opening Critiques</h2>
+    <div class="round-intro">Each expert's primary technical critique of the build, in their authentic voice and through their known framework.</div>
+
+    <div class="critique expert-1">
+      <div class="speaker">Martin Kleppmann</div>
+      <div class="style-note">Methodical, precise, will pull a specific sentence from the document and examine it from first principles. References his own book often. Never vague.</div>
+      <p>The document says: "The system will automatically generate schedules using a modified Gale-Shapley algorithm." Let me unpack what "modified" means here, because the modification is where all the hard problems live.</p>
+      <p>The original Gale-Shapley algorithm requires complete strict preference orderings — every proposer ranks every acceptor, no ties. This system uses a 3-tier preference system: Yes, Neutral, No. That is a partial order with ties within each tier. The algorithm as described does not specify tiebreaker logic. Within Priority 1 (mutual Yes), if Fintech A and Fintech B both have mutual Yes with CU X, which one gets the time slot? Within Priority 4 gap-filling with fallback participants, which fallback gets assigned first? These are not edge cases — they are the common case. Every real event will have multiple participants at the same priority level competing for the same slots.</p>
+      <p>Second: the algorithm is described as a one-shot batch process. But real events have operational continuity. A Fintech company registers late. An organizer manually overrides one meeting. A CU executive cancels the morning of the event. Is the algorithm re-runnable? If it re-runs, does it preserve existing confirmed assignments or regenerate from scratch? If it preserves assignments, how does it handle the constraint that a re-run may now conflict with a manually overridden slot? The PRD's Section 6 asks about manual overrides but doesn't connect that answer to the algorithm's re-runnability requirement.</p>
+      <p>Third: the correctness testing strategy — "stress testing with 500+ simulated participants in Week 10-12" — tests performance, not correctness. Correctness requires a test oracle: a separate, verified implementation or a formal specification you can compare against. Without a spec, you cannot write a correctness test. You can only observe that the algorithm ran and produced output. Whether that output correctly respects the priority hierarchy for every assignment is unknowable without a formal definition of "correct."</p>
+    </div>
+
+    <div class="critique expert-2">
+      <div class="speaker">Kelsey Hightower</div>
+      <div class="style-note">Practical, concrete, will name specific technologies and explain exactly why each one adds unnecessary complexity. Measured tone but uncompromising on operational reality.</div>
+      <p>Let me work through the tech stack against the actual operational profile of this application. This is a tool used by event organizers for 2–3 events per year. The preference submission window is maybe 2 weeks. Peak concurrent users: 50–200 participants submitting form responses. The matching algorithm runs once per event. The system is essentially idle the rest of the year.</p>
+      <p><strong>TiDB</strong> is a distributed SQL database designed for horizontal scale — petabytes of data, thousands of concurrent transactions. The rational operating envelope for TiDB starts at the kind of load that breaks standard PostgreSQL. This application will never get close to that load. Standard PostgreSQL on a single managed instance (Railway, Render, Supabase) handles this workload with zero operational complexity and full standard SQL semantics. TiDB's "PostgreSQL compatibility" is not PostgreSQL equivalence — there are documented divergences in transaction isolation, constraint enforcement, and function behavior that will surface as bugs in Drizzle ORM queries at the worst possible time: during an event.</p>
+      <p><strong>Python microservice (optional).</strong> Let's do the math. The maximum matching problem here is 500 participants, 50 time slots, 500×500 = 250,000 preference pairs. A naive O(n²) pass through the preference graph in JavaScript completes in under 5 milliseconds on any modern server. There is no computational justification for a Python/NumPy microservice at this scale. "Optional" in a spec means "mandatory when the simple version hits a problem nobody anticipated." The right approach: implement matching in Node.js, benchmark it, and introduce a Python service only if you can demonstrate that JavaScript is the bottleneck. You won't be able to demonstrate that.</p>
+      <p><strong>Puppeteer</strong> runs a headless Chromium process to render HTML to PDF. It consumes 200–500 MB of memory per instance, requires a Chrome installation in the deployment environment, and introduces Chrome's own update/security surface into your application. The output for this use case is a meeting schedule table — structured tabular data. A lightweight PDF library (<code>pdfmake</code>, <code>jsPDF</code>, or <code>@react-pdf/renderer</code>) produces this output directly from data structures without a browser dependency. Puppeteer is the right tool when you need pixel-perfect rendering of complex interactive web pages. It is not the right tool for a schedule table.</p>
+    </div>
+
+    <div class="critique expert-3">
+      <div class="speaker">Charity Majors</div>
+      <div class="style-note">Direct, practitioner-focused, speaks from production incident experience. Her thesis is always: "the question you can't answer in production is the question you should have asked in development."</div>
+      <p>I want to ask a question this PRD never asks: when the algorithm produces a schedule that a participant thinks is wrong, how does the event organizer investigate?</p>
+      <p>This is not a hypothetical. At every real event, someone will look at their schedule and say "why am I meeting this person?" Maybe a Fintech sponsor got a Priority 4 gap-fill meeting with a fallback participant they've never heard of. Maybe a CU executive has back-to-back meetings that don't look back-to-back. Maybe a mutual Yes match didn't get assigned to the same slot. How does the organizer debug this? What logs exist? Can they see what priority level produced each meeting assignment? Can they replay the algorithm's decision for a specific slot?</p>
+      <p>The Phase 2 analytics dashboard shows aggregate statistics: how many meetings were filled by each priority level. That is analytics — population-level data. It cannot answer a question about a specific assignment. Observability is different from analytics. Observability means: given any output the system produced, I can reconstruct why. Without per-assignment decision logs, the matching engine is a black box deployed into a high-stakes live event where Fintech sponsor relationships are on the line.</p>
+      <p>In my experience, batch algorithms that run once and produce "final" outputs are actually the hardest systems to debug, because the state that produced the output is gone by the time someone finds the problem. The solution is inexpensive: log every assignment decision at execution time — participant IDs, priority tier used, alternatives considered and why rejected, fallback trigger if applicable. Store it. Expose it to admins. This turns "why is this on my schedule?" from an unanswerable question into a 10-second lookup.</p>
+    </div>
+
+    <div class="critique expert-4">
+      <div class="speaker">DHH</div>
+      <div class="style-note">Calm, occasionally provocative, speaks from 20+ years of building web applications with minimal teams. Will name the specific pattern he's seeing and explain why it leads to pain.</div>
+      <p>The architecture described here is a distributed system for a single-server problem. Let me count the runtime components implied by the tech stack: a React frontend (requires a build step and a CDN or static host), a Node.js/Express API server, an optional Python microservice with its own deployment and inter-service communication, a TiDB cluster (multiple nodes for the distributed SQL layer), and a Puppeteer process (headless Chrome, likely in a separate container because of memory requirements). That's potentially five runtime components for an application with a peak load of maybe 200 concurrent form submissions.</p>
+      <p>We built Basecamp on a Rails monolith for a decade while serving millions of users. The lesson isn't that monoliths are always right — it's that you pay for distributed complexity every day, regardless of whether you're at 10 users or 10 million. Every service boundary is a network call that can fail. Every separate deployment is an operational surface you have to monitor. Every inter-service communication path is a distributed tracing problem when something goes wrong.</p>
+      <p>This application's entire feature set — preference form, matching algorithm, schedule generation, PDF export, admin dashboard — fits comfortably in a single well-organized server application. The matching algorithm runs as a background job, not a request handler. The PDF generation happens in-process. The Cvent sync is a scheduled task. One process, one database, one log stream, one deployment. When the algorithm produces a wrong output, you trace it in one place. When the deployment fails, there's one thing to restart. This isn't a limitation — it's the appropriate level of complexity for the problem.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 2 -->
+<div id="round2" class="section">
+  <div class="round">
+    <h2>Round 2 — Cross-Examination</h2>
+    <div class="round-intro">Experts challenge each other's positions. Second-order risks emerge from the interactions between concerns.</div>
+
+    <div class="exchange expert-1">
+      <div class="from-to">Kleppmann → Majors</div>
+      <div class="exchange-speaker" style="color:#4ecdc4;">Martin Kleppmann</div>
+      <p>Charity, your observability argument connects to a deeper issue I want to name: the audit log isn't just an operational tool, it's the proof that the algorithm honored its contract. The product's core value proposition is priority-based matching. If a Fintech sponsor can't verify that their Priority 1 mutual-match was assigned before a Priority 3 Fintech-led match, the priority guarantee is unverifiable. It exists only in the spec, not in the output.</p>
+      <p>The per-assignment log you're describing is essentially a trace of the algorithm's execution. And that trace is also the test oracle that Kleppmann's correctness testing requires. If you log every decision with its priority level and the alternatives considered, you can write post-hoc correctness tests that verify: no Priority 4 assignment was made when a Priority 2 slot was available; every mutual Yes pair that could be scheduled was scheduled; fallback participants were only assigned after natural matches were exhausted. The observability artifact and the correctness verification artifact are the same thing.</p>
+    </div>
+
+    <div class="exchange expert-2">
+      <div class="from-to">Hightower → DHH</div>
+      <div class="exchange-speaker" style="color:#60a5fa;">Kelsey Hightower</div>
+      <p>David, I agree on the monolith, but I want to be precise about one component that deserves isolation even within a monolithic architecture: the matching algorithm's execution context. The algorithm is CPU-bound and potentially long-running (though probably only seconds at this scale). Running it synchronously in a web request handler blocks the entire server. Even in a Rails or Django monolith, you'd put this in a background job processor — Sidekiq, GoodJob, BullMQ, Celery, whatever the framework provides. The question isn't microservice vs. monolith; it's: how does the admin trigger the algorithm, monitor its progress, and receive its output without blocking the web server?</p>
+      <p>A background job within the monolith solves this cleanly. It also gives you a natural place to attach the decision log Charity is asking for — the job emits structured logs as it assigns each meeting, and those logs are queryable in the same application database. No separate service, no inter-process communication, no distributed tracing required.</p>
+    </div>
+
+    <div class="exchange expert-3">
+      <div class="from-to">Majors → Kleppmann</div>
+      <div class="exchange-speaker" style="color:#f5a623;">Charity Majors</div>
+      <p>Martin, your tiebreaker point has a concrete operational implication I want to surface. When tiebreaker logic is unspecified, the algorithm's behavior becomes implementation-dependent — whichever order the database returns rows in, or whichever sort the developer applies, becomes the de facto tiebreaker. That means two re-runs of the algorithm on identical input data might produce different schedules if row ordering changes. And in a system where event organizers may want to re-run the algorithm after adding late registrants, non-determinism is a serious problem: previously confirmed meetings may shift, participants who were notified of their schedule may receive a different schedule on the next run.</p>
+      <p>The fix requires two things: (1) explicitly specify the tiebreaker — asset size descending for CU ranking, registration date for Fintech ranking, whatever makes sense to the organizer — and (2) make the algorithm deterministic given the same input, which means controlling all sources of non-determinism including database row ordering and UUID-based sorts. These need to be in the algorithm spec before implementation, not discovered in testing.</p>
+    </div>
+
+    <div class="exchange expert-4">
+      <div class="from-to">DHH → Kleppmann</div>
+      <div class="exchange-speaker" style="color:#a78bfa;">DHH</div>
+      <p>Martin, your point about the open questions in Section 6 connects to something I see constantly: a PRD that asks "will table assignments be static or dynamic?" at the end is a PRD that cannot produce a complete data model at the beginning. The Week 1-2 deliverable is listed as "finalize the database schema." But the schema for static table assignments — where each Fintech company has a fixed table number for the entire event — is fundamentally different from the schema for dynamic assignments — where both parties move between slots. In the static model, <code>table_number</code> is an attribute of the Fintech participant. In the dynamic model, it's an attribute of the meeting assignment. These are different schemas with different query patterns and different migration complexity if you get it wrong and need to change it.</p>
+      <p>You cannot finalize the schema without answering Section 6's questions first. The roadmap has the sequence backwards: those questions should be resolved in Week 1, the algorithm spec written in Week 1-2, and the schema designed from the spec in Week 2. The current roadmap treats schema design as the starting point when it should be the output of the spec process.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 3 -->
+<div id="round3" class="section">
+  <div class="round">
+    <h2>Round 3 — Steelman &amp; Rebuttal</h2>
+    <div class="round-intro">The strongest possible case for the build as written, then each expert's rebuttal.</div>
+
+    <div class="steelman-block">
+      <h4>Steelman: The Case For the Build As Specified</h4>
+      <p>The core build concept is technically sound and the problem is well-suited to the proposed approach. The preference data model — participants, Yes/No/Neutral votes, time slots, meeting assignments — is a standard relational structure that PostgreSQL handles naturally. The 4-level priority matching logic is deterministic given a complete algorithm implementation, and the problem space is small enough (≤500 participants, ≤50 slots) that almost any reasonable implementation will be fast enough. React + Node.js + PostgreSQL is an industry-standard stack with massive developer availability and well-understood operational characteristics.</p>
+      <p>The TiDB choice via PostgreSQL compatibility means the team retains the ability to scale horizontally if the product expands beyond the credit union niche to larger events. The Python microservice as an optional hedge is architecturally honest — it acknowledges that the algorithm's computational profile at scale is unknown, while not committing to the overhead until it's needed. The Puppeteer choice produces pixel-perfect PDFs that exactly match the web view participants see, which reduces confusion about schedule format.</p>
+      <p>The organizer has also confirmed that fallback participants will be provided when natural matches are exhausted — directly addressing the fill guarantee fragility. With fallbacks available, the 100% fill constraint becomes achievable in practice, not just in theory.</p>
+    </div>
+
+    <div class="critique expert-1" style="margin-top:1.5rem;">
+      <div class="speaker">Martin Kleppmann — Rebuttal</div>
+      <p>"Deterministic given a complete algorithm implementation" is doing a lot of work in the steelman. The implementation cannot be complete if the spec is incomplete. The tiebreaker logic, the re-runnability contract, and the fallback participant priority tier are all unspecified. A developer implementing this algorithm today would make implicit decisions about all three — decisions that may conflict with the organizer's expectations and that won't be discoverable until a real event surfaces the discrepancy.</p>
+      <p>On fallback participants specifically: the steelman says they resolve the fill guarantee fragility. They do, but they introduce a new spec requirement. What priority tier are fallback participants? Are they Priority 5 (below Neutral), or are they treated as Neutral participants who happen to always be willing? Does the algorithm attempt to assign all natural matches before touching fallbacks, or can a fallback appear in a slot where a Neutral CU was also available? Does the schedule output distinguish fallback meetings from organic ones — for the organizer's visibility, even if not the participant's? These are not obvious questions, and the answers affect both the data model and the matching logic.</p>
+    </div>
+
+    <div class="critique expert-2" style="margin-top:1rem;">
+      <div class="speaker">Kelsey Hightower — Rebuttal</div>
+      <p>The steelman's TiDB argument — "retains horizontal scaling ability" — is a future-optionality argument for a current-complexity cost. Every day you run TiDB, you pay the operational overhead of a distributed SQL cluster. Every query you write, you rely on PostgreSQL compatibility that is documented to have exceptions. The correct time to add TiDB is when standard PostgreSQL can demonstrably no longer handle the load — not speculatively, years before that load exists.</p>
+      <p>The Python microservice "architectural honesty" argument similarly conflates acknowledging uncertainty with managing it wisely. The right way to manage unknown computational requirements is to implement in Node.js, measure, and introduce a Python service when measurement shows it's needed. Putting an "optional" Python service in the architecture document doesn't reduce complexity — it increases it, because every developer who reads that document has to decide whether this event is the one that requires the Python service.</p>
+    </div>
+
+    <div class="critique expert-3" style="margin-top:1rem;">
+      <div class="speaker">Charity Majors — Rebuttal</div>
+      <p>The Puppeteer "pixel-perfect match to web view" argument assumes that pixel-perfect fidelity is the primary value of the PDF output. It isn't. The primary value is that event participants can read their schedule on a printed page. A table with Time | Table # | Meeting With | Details does not require Chromium to render correctly. The format fidelity argument is solving a problem that doesn't exist at this output complexity level.</p>
+      <p>More importantly: the steelman doesn't address observability at all. "Technically sound" and "correct on the happy path" are different claims. The build is probably technically sound for the median case. The question is what happens at the tail — the late registration, the algorithm re-run, the disputed assignment. That's where the absence of decision logging creates an unresolvable support problem.</p>
+    </div>
+
+    <div class="critique expert-4" style="margin-top:1rem;">
+      <div class="speaker">DHH — Rebuttal</div>
+      <p>The steelman's strongest point is developer availability for the React/Node/PostgreSQL stack. I don't dispute that. But developer availability solves the hiring problem, not the architecture problem. You can hire Rails developers or Django developers just as easily. The stack choice should be driven by the application's operational profile, not by résumé prevalence.</p>
+      <p>The fallback participant point in the steelman is actually the most important update to the build requirements, and it hasn't been architecturally addressed yet. If fallback participants exist as a first-class concept — participants who are always available to fill gaps but are distinguishable from organic attendees — they need a data model representation. Are they stored in the same participants table with a <code>type: 'fallback'</code> flag? Does the algorithm's priority logic query them differently? Does the admin see them differently in the schedule output? These are schema questions the steelman acknowledges without answering.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 4 -->
+<div id="round4" class="section">
+  <div class="round">
+    <h2>Round 4 — Build Proposals</h2>
+    <div class="round-intro">Each expert's highest-priority concrete modification to the build. Cross-endorsements noted.</div>
+
+    <div class="critique expert-1">
+      <div class="speaker">Martin Kleppmann — Priority Proposal</div>
+      <p><strong style="color:#4ecdc4;">Write a complete algorithm specification document before any schema or implementation work begins.</strong></p>
+      <p>The spec must answer, at minimum:</p>
+      <ul>
+        <li><strong>Tiebreaker logic:</strong> Within each priority tier, how are competing candidates ranked? (Suggested: CU asset size descending as primary tiebreaker; registration date as secondary. This must be explicitly chosen, not left to implementation.)</li>
+        <li><strong>Fallback participant tier:</strong> Fallback participants are Priority 5 — assigned only after all Priority 4 (Neutral) natural matches are exhausted. The algorithm must attempt all natural matches before touching the fallback pool. This must be specified, not inferred.</li>
+        <li><strong>Re-runnability contract:</strong> Can the algorithm be re-run after manual overrides? If yes: does it preserve locked assignments? What is the "lock" data model? If no: the organizer has no path to correct algorithm errors without a full re-run that destroys all prior output.</li>
+        <li><strong>Back-to-back definition:</strong> Is "back-to-back" for CU schedules a hard constraint (the algorithm must never leave a gap if a meeting can be placed adjacently) or a soft optimization (minimize gaps)? These have different algorithmic complexity and failure behaviors.</li>
+        <li><strong>Missing preference handling:</strong> If a participant didn't submit preferences by the deadline, are they treated as all-Neutral, excluded entirely, or flagged for manual handling?</li>
+      </ul>
+      <p>This document becomes the test oracle for correctness tests. <span class="tag">Majors endorses</span> <span class="tag">DHH endorses</span></p>
+    </div>
+
+    <div class="critique expert-2">
+      <div class="speaker">Kelsey Hightower — Priority Proposal</div>
+      <p><strong style="color:#60a5fa;">Simplify the stack to four components: React frontend + Node.js monolith + standard PostgreSQL + background job.</strong></p>
+      <p>Specific changes:</p>
+      <ul>
+        <li>Replace <strong>TiDB with standard PostgreSQL</strong> (Supabase, Railway, or Render — managed, no cluster to operate). Remove all TiDB-specific configuration.</li>
+        <li>Remove the <strong>Python microservice</strong> from the architecture entirely. Implement matching in Node.js. Benchmark it against realistic data before considering alternatives. At 500 participants, JavaScript is not the bottleneck.</li>
+        <li>Replace <strong>Puppeteer</strong> with <code>pdfmake</code> or <code>@react-pdf/renderer</code>. Remove the Chrome/Chromium deployment dependency. The schedule output is a table — no pixel-perfect rendering required.</li>
+        <li>Run the matching algorithm as a <strong>background job</strong> within the Node.js application (BullMQ + Redis, or a simple database-backed job queue). Not a separate service — the same process, triggered asynchronously.</li>
+      </ul>
+      <p>Result: one backend process, one database, no inter-service communication, one deployment target. <span class="tag">DHH endorses</span></p>
+    </div>
+
+    <div class="critique expert-3">
+      <div class="speaker">Charity Majors — Priority Proposal</div>
+      <p><strong style="color:#f5a623;">Add per-assignment decision logging as a Phase 1 requirement with an admin "match explanation" view.</strong></p>
+      <p>For every meeting slot assigned by the algorithm, persist a decision record containing:</p>
+      <ul>
+        <li>Assignment: Fintech ID, CU ID (or fallback participant ID), time slot, table number</li>
+        <li>Priority tier used (1–5, where 5 = fallback participant)</li>
+        <li>Alternatives considered at higher priority tiers that were unavailable and why (already booked, on No list, slot conflict)</li>
+        <li>Whether a fallback participant was used and which natural matches were exhausted first</li>
+        <li>Algorithm run ID and timestamp (so re-runs are distinguishable)</li>
+      </ul>
+      <p>Expose this as an admin "Explain This Match" panel alongside the schedule view. When a sponsor asks "why is this person on my schedule?", the organizer clicks one button and sees the exact decision chain. This eliminates an entire support category and validates the priority guarantee visually. <span class="tag">Kleppmann endorses</span> — this is simultaneously the observability artifact and the correctness test oracle.</p>
+    </div>
+
+    <div class="critique expert-4">
+      <div class="speaker">DHH — Priority Proposal</div>
+      <p><strong style="color:#a78bfa;">Resolve the Section 6 open questions before Week 1 of the roadmap, and model fallback participants explicitly in the data schema.</strong></p>
+      <p>The four open questions in Section 6 are not post-launch refinements — they are schema-blocking requirements:</p>
+      <ul>
+        <li><strong>Table assignment (static vs. dynamic)</strong> determines whether <code>table_number</code> is on the <code>participants</code> table or the <code>meeting_assignments</code> table.</li>
+        <li><strong>Meeting duration + transition time</strong> determines the number of time slots available, which determines the size of the scheduling problem the algorithm must solve.</li>
+        <li><strong>Manual overrides</strong> requires a <code>locked</code> boolean on meeting assignments and a re-runnability contract in the algorithm spec.</li>
+        <li><strong>Cvent field mapping</strong> determines whether the participant import from Cvent can be automated or requires manual data cleaning before each event.</li>
+      </ul>
+      <p>Additionally: fallback participants must be first-class in the data model. Proposed: a <code>participant_type</code> field with values <code>organic</code> and <code>fallback</code>. The algorithm queries fallback participants only after natural Priority 4 (Neutral) matches are exhausted. The admin schedule view shows a "Fallback" badge on assignments that used them. The participant-facing schedule does not distinguish — fallback participants appear as normal attendees to the Fintech sponsor. <span class="tag">Kleppmann endorses</span> <span class="tag">Hightower endorses</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- SYNTHESIS -->
+<div id="synthesis" class="section">
+  <h2 style="color:#4ecdc4; margin-bottom:0.5rem;">Build Red-Team Synthesis</h2>
+  <p style="color:#888; margin-bottom:1.5rem;">Technical vulnerabilities ranked by severity · Architecture conflicts · Concrete modifications · Residual risks</p>
+
+  <div class="callout">
+    <strong>On fallback participants:</strong> The organizer's confirmation that fallback participants will be provided is a meaningful fix to the fill guarantee fragility. However, it introduces new specification requirements: fallback participants must be a Priority 5 tier in the algorithm, modeled as a distinct participant type in the schema, and surfaced in admin-facing schedule views while remaining invisible to the Fintech sponsor's printed schedule. None of this is currently in the PRD.
+  </div>
+
+  <h3 class="sh red">Critical Vulnerabilities</h3>
+
+  <div class="vulnerability">
+    <span class="severity high">High</span>
+    <h4>Algorithm Spec Incomplete — Tiebreakers, Re-Runnability, and Edge Cases Undefined</h4>
+    <p>The matching algorithm cannot be correctly implemented from the current specification. Missing: (1) tiebreaker logic within priority tiers — every real event will have multiple participants at the same priority level competing for the same slot; (2) re-runnability contract — can the algorithm run again after manual overrides, and if so, does it preserve locked assignments?; (3) behavior when a participant submits no preferences (treat as all-Neutral? Exclude?); (4) how fallback participants fit into the priority tier structure. Without these, developer implementation choices become de facto spec decisions, leading to behavior the organizer didn't expect. <strong>Raised by Kleppmann; reinforced by DHH and Majors.</strong></p>
+  </div>
+
+  <div class="vulnerability">
+    <span class="severity high">High</span>
+    <h4>Schema Cannot Be Finalized Until Section 6 Open Questions Are Answered</h4>
+    <p>Week 1-2 of the roadmap is "Finalize the database schema." This is impossible without answers to: (1) static vs. dynamic table assignment (changes where <code>table_number</code> lives); (2) meeting duration and transition time (determines slot count, which the algorithm needs); (3) manual override requirement (adds a <code>locked</code> field to assignments and a re-run contract to the algorithm). The current roadmap has schema design gating algorithm design when the correct sequence is: answer open questions → write algorithm spec → design schema from spec. <strong>Raised by DHH and Hightower.</strong></p>
+  </div>
+
+  <div class="vulnerability">
+    <span class="severity high">High</span>
+    <h4>No Per-Assignment Audit Logging — Algorithm Decisions Unverifiable in Production</h4>
+    <p>When a participant disputes their schedule at a live event, there is currently no mechanism to explain why any specific meeting was assigned. The Phase 2 analytics dashboard provides population-level statistics, not per-assignment explanations. This is the difference between analytics and observability. Without decision logs, every support request about a schedule becomes an unresolvable debugging session. Per-assignment logging is inexpensive to add (a decision record per assignment, written during algorithm execution) and eliminates an entire support category. <strong>Raised by Majors; endorsed by Kleppmann who notes it also provides the correctness test oracle.</strong></p>
+  </div>
+
+  <div class="vulnerability">
+    <span class="severity medium">Medium</span>
+    <h4>TiDB Adds Consistency Risk for a Problem Standard PostgreSQL Handles Trivially</h4>
+    <p>TiDB is PostgreSQL-compatible but not PostgreSQL-equivalent. Transaction isolation semantics, constraint enforcement, and ORM query behavior can diverge in documented ways. For a matching algorithm that requires consistent reads of preference data — a participant's Yes/No/Neutral state must not change mid-run — a database that behaves "mostly like PostgreSQL" is a correctness liability. Standard PostgreSQL on a managed single instance handles this workload with zero operational complexity and full standard semantics. <strong>Raised by Hightower and Kleppmann.</strong></p>
+  </div>
+
+  <div class="vulnerability">
+    <span class="severity medium">Medium</span>
+    <h4>Algorithm Non-Determinism Risk from Unspecified Tiebreakers</h4>
+    <p>Without explicit tiebreaker logic, algorithm output depends on database row ordering and implementation-specific sort behavior. Two runs on identical input data may produce different schedules if row ordering changes (e.g., after a new index is added). In a system where re-runs may be needed after late registrations, non-determinism means previously communicated schedules may shift unexpectedly. Fix: explicitly specify all tiebreakers in the algorithm spec, and control all sources of non-determinism (including database query order) in the implementation. <strong>Raised by Majors in cross-examination.</strong></p>
+  </div>
+
+  <div class="vulnerability">
+    <span class="severity low">Low</span>
+    <h4>Puppeteer is Over-Engineered for Tabular Schedule PDF Generation</h4>
+    <p>Puppeteer runs a headless Chromium instance (200–500 MB memory, Chrome deployment dependency) to render schedule tables that a lightweight PDF library handles directly from data structures. The "pixel-perfect match to web view" argument doesn't apply at this output complexity. <code>pdfmake</code> or <code>@react-pdf/renderer</code> produce correct tabular output without a browser dependency. <strong>Raised by Hightower.</strong></p>
+  </div>
+
+  <h3 class="sh purple">Conflicting Expert Views</h3>
+
+  <div class="conflict">
+    <h4>Algorithm Execution Context: Background Job vs. Microservice</h4>
+    <div class="vs">
+      <div><strong style="color:#f5a623;">Majors:</strong> The matching algorithm is CPU-bound and should run asynchronously — not in a web request handler. Needs progress monitoring and error handling.</div>
+      <div><strong style="color:#a78bfa;">DHH:</strong> Background job within the monolith (BullMQ/Sidekiq pattern) — same codebase, same logs, no inter-service communication.</div>
+    </div>
+    <p class="implication">Resolution: These positions agree. Both want async background execution within a monolithic application. The Python microservice is rejected by both. <strong>No conflict — consensus on background job in monolith.</strong></p>
+  </div>
+
+  <div class="conflict">
+    <h4>How Much Spec Rigor is Required Before Implementation?</h4>
+    <div class="vs">
+      <div><strong style="color:#4ecdc4;">Kleppmann:</strong> A complete formal spec — inputs, constraints, tiebreakers, edge cases — must precede any implementation. The spec is the test oracle.</div>
+      <div><strong style="color:#60a5fa;">Hightower:</strong> The spec must answer the Section 6 questions and define fallback behavior; some implementation choices (like tiebreaker sort order) can be made pragmatically in code with clear comments.</div>
+    </div>
+    <p class="implication">Implication: Both agree a spec is required before coding. Kleppmann's version is more formal; Hightower's version is more pragmatic. The minimum viable spec must cover: tiebreakers, re-runnability, fallback tier, missing preference handling. Additional formalism is valuable but not blocking.</p>
+  </div>
+
+  <h3 class="sh teal">Recommended Modifications</h3>
+
+  <div class="recommendation">
+    <h4>1. Answer Section 6 Open Questions Before Week 1 Begins</h4>
+    <p>The four open questions (table assignment model, meeting duration, manual overrides, Cvent field mapping) are schema-blocking. They must be answered before any database design work. Recommended pre-work: a 1-hour session with the event organizer to resolve each question. Output is a decision log, not a document. <span class="tag">DHH</span> <span class="tag">Hightower</span></p>
+  </div>
+
+  <div class="recommendation">
+    <h4>2. Write a Complete Algorithm Spec Before Implementation</h4>
+    <p>Required content: tiebreaker logic within each priority tier; fallback participant as Priority 5 (below all natural matches); re-runnability contract (locked assignments preserved on re-run); back-to-back definition (hard constraint vs. soft optimization); missing preference handling. This document is the implementation contract and the test oracle. <span class="tag">Kleppmann</span> <span class="tag">Majors</span> <span class="tag">DHH</span></p>
+  </div>
+
+  <div class="recommendation">
+    <h4>3. Model Fallback Participants Explicitly in the Schema</h4>
+    <p>Add <code>participant_type ENUM('organic', 'fallback')</code> to the participants table. Algorithm queries the fallback pool only after Priority 4 natural matches are exhausted. Admin schedule view shows a "Fallback" badge on assignments that used the fallback pool. Participant-facing printed schedule does not distinguish — fallback participants appear as normal attendees. <span class="tag">DHH</span> <span class="tag">Kleppmann</span></p>
+  </div>
+
+  <div class="recommendation">
+    <h4>4. Add Per-Assignment Decision Logging to Phase 1</h4>
+    <p>Persist a decision record for every meeting slot during algorithm execution: participant IDs, priority tier used (1–5), alternatives considered and rejection reasons, algorithm run ID. Expose as an admin "Explain This Match" view. This converts "why is this on my schedule?" from an unanswerable question to a 10-second lookup, and provides post-hoc correctness verification. <span class="tag">Majors</span> <span class="tag">Kleppmann</span></p>
+  </div>
+
+  <div class="recommendation">
+    <h4>5. Simplify the Stack: PostgreSQL + Node.js Monolith + Background Job</h4>
+    <p>Replace TiDB with standard PostgreSQL. Remove the Python microservice — implement matching in Node.js, benchmark it (it will be fast enough). Replace Puppeteer with <code>pdfmake</code> or <code>@react-pdf/renderer</code>. Run the algorithm as a background job within the Node.js application. Result: one backend process, one database, no inter-service communication. <span class="tag">Hightower</span> <span class="tag">DHH</span></p>
+  </div>
+
+  <h3 class="sh orange">Residual Risks</h3>
+
+  <div class="residual">
+    <h4>Correctness Verification at Scale</h4>
+    <p>Even with a complete spec and decision logging, verifying that the algorithm correctly respects the priority hierarchy across all 250,000 possible preference pairs at 500 participants requires a test oracle implementation. The Week 10-12 stress test should include a reference implementation (a simpler, slower algorithm that implements the same spec) and compare outputs for correctness, not just performance.</p>
+  </div>
+
+  <div class="residual">
+    <h4>Cvent API Reliability</h4>
+    <p>The Phase 2 Cvent integration creates a dependency on an external API that has historically changed without adequate notice for smaller integration partners. OAuth2 token refresh failures and endpoint deprecations are the most common failure modes. This is an accepted Phase 2 risk if the integration is treated as a feature with an explicit maintenance budget and graceful degradation (manual CSV import as fallback).</p>
+  </div>
+
+  <div class="residual">
+    <h4>Algorithm Behavior With Very Small Events</h4>
+    <p>The stress test targets 500+ participants. The algorithm's behavior at small events (10 Fintech companies, 20 CU attendees, 5 time slots) may have different edge case characteristics — including cases where there are more available slots than willing participants even with fallbacks. Small event behavior should be explicitly tested, not assumed to be a trivial subset of large event behavior.</p>
+  </div>
+
+  <div class="confidence-meter">
+    <h3>Build Robustness Assessment</h3>
+    <div class="label">Moderate — Spec and Architecture Gaps Must Close Before Development</div>
+    <div class="bar"><div class="fill" style="width: 58%; background: linear-gradient(90deg, #4ecdc4, #60a5fa);"></div></div>
+    <p class="details"><strong style="color:#4ecdc4;">Strongest:</strong> Core data model concept (participants, preferences, slots, assignments) is well-suited to relational SQL. Problem is computationally tractable at target scale. Fallback participants resolve the fill guarantee fragility.</p>
+    <p class="details"><strong style="color:#e94560;">Weakest:</strong> Algorithm spec has unresolved tiebreakers and undefined edge cases. Schema cannot be designed until open questions are answered. No observability plan for production debugging.</p>
+  </div>
+</div>
+
+<script>
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
