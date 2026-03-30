@@ -36,7 +36,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ─── NAV ─── */
   nav {
     display: flex;
     align-items: center;
@@ -74,7 +73,6 @@
   }
   .nav-cta:hover { background: var(--accent-hover) !important; }
 
-  /* ─── HERO ─── */
   .hero {
     max-width: 1140px;
     margin: 0 auto;
@@ -172,7 +170,6 @@
     background: var(--accent);
   }
 
-  /* ─── PROOF BAR ─── */
   .proof-bar {
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
@@ -198,7 +195,6 @@
     margin-top: 2px;
   }
 
-  /* ─── SECTION HEADERS ─── */
   .section-label {
     font-size: 0.78rem;
     font-weight: 700;
@@ -222,7 +218,6 @@
     max-width: 600px;
   }
 
-  /* ─── SIGNAL SECTION ─── */
   .signal-section {
     max-width: 1140px;
     margin: 0 auto;
@@ -299,7 +294,6 @@
     font-weight: 600;
   }
 
-  /* ─── FEATURES GRID ─── */
   .features-section {
     max-width: 1140px;
     margin: 0 auto;
@@ -347,7 +341,6 @@
     line-height: 1.6;
   }
 
-  /* ─── HOW IT WORKS ─── */
   .how-section {
     border-top: 1px solid var(--border);
     padding: 80px 24px;
@@ -396,7 +389,6 @@
     line-height: 1.6;
   }
 
-  /* ─── BEFORE / AFTER ─── */
   .compare-section {
     max-width: 1140px;
     margin: 0 auto;
@@ -444,21 +436,20 @@
     position: relative;
   }
   .compare-card.old li::before {
-    content: '✗';
+    content: '\2717';
     position: absolute;
     left: 0;
     color: var(--red);
     font-weight: 700;
   }
   .compare-card.new li::before {
-    content: '✓';
+    content: '\2713';
     position: absolute;
     left: 0;
     color: var(--accent);
     font-weight: 700;
   }
 
-  /* ─── AI CHAT SECTION ─── */
   .ai-section {
     border-top: 1px solid var(--border);
     padding: 80px 24px;
@@ -527,7 +518,6 @@
     flex-shrink: 0;
   }
 
-  /* ─── QUESTIONS ROW ─── */
   .questions-section {
     max-width: 1140px;
     margin: 0 auto;
@@ -559,7 +549,6 @@
     display: block;
   }
 
-  /* ─── PRICING TEASER ─── */
   .pricing-section {
     border-top: 1px solid var(--border);
     padding: 80px 24px;
@@ -608,7 +597,6 @@
     color: var(--text-dim);
   }
 
-  /* ─── FINAL CTA ─── */
   .final-cta {
     background: var(--bg-card);
     border-top: 1px solid var(--border);
@@ -635,7 +623,6 @@
     margin-top: 14px;
   }
 
-  /* ─── FOOTER ─── */
   footer {
     max-width: 1140px;
     margin: 0 auto;
@@ -656,7 +643,6 @@
   footer a:hover { color: var(--text); }
   .footer-links { display: flex; gap: 20px; }
 
-  /* ─── RESPONSIVE ─── */
   @media (max-width: 768px) {
     .signal-grid, .compare-grid, .ai-inner { grid-template-columns: 1fr; }
     .features-grid { grid-template-columns: 1fr; }
@@ -675,7 +661,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a href="/" class="logo">Menu<span>Spy</span></a>
   <div class="nav-links">
@@ -688,16 +673,14 @@
   </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════════════════
-     HERO — Headline unchanged. Sub-copy rewritten in VOC.
-     ═══════════════════════════════════════════════════════ -->
+<!-- HERO — Headline untouched. Sub-copy in VOC language. -->
 <section class="hero">
-  <div class="hero-badge">✦ Built for owners who are tired of guessing</div>
+  <div class="hero-badge">&#x2726; Built for restaurant owners who are tired of guessing</div>
   <h1>Stop Guessing.<br>Start <em>Profiting.</em></h1>
-  <p class="sub">Know what every restaurant near you is charging. See what their customers are saying. Find out — in seconds — if you're leaving money on the table.</p>
+  <p class="sub">Know what every restaurant near you is charging. See what their customers are saying. Find out &#8212; in seconds &#8212; if you're leaving money on the table.</p>
   <div class="hero-ctas">
-    <a href="/auth?tab=signup" class="btn-primary">Start free — no card needed →</a>
-    <a href="#signal" class="btn-ghost">See it in action ↓</a>
+    <a href="/auth?tab=signup" class="btn-primary">Start free &#8212; no card needed &#8594;</a>
+    <a href="#signal" class="btn-ghost">See it in action &#8595;</a>
   </div>
   <div class="trust-row">
     <span class="trust-item"><span class="dot"></span> Your data stays yours</span>
@@ -707,61 +690,57 @@
   </div>
 </section>
 
-<!-- PROOF BAR — numbers from the real world -->
+<!-- PROOF BAR — honest capability statements, no uncited metrics -->
 <section class="proof-bar">
   <div class="proof-bar-inner">
     <div class="proof-stat">
-      <span class="num">$2,400</span>
-      <span class="label">avg. found revenue per location/year</span>
-    </div>
-    <div class="proof-stat">
-      <span class="num">38 sec</span>
+      <span class="num">Under 60s</span>
       <span class="label">to your first competitor snapshot</span>
     </div>
     <div class="proof-stat">
-      <span class="num">4.8★</span>
-      <span class="label">average owner rating</span>
+      <span class="num">Every day</span>
+      <span class="label">competitor menus checked automatically</span>
     </div>
     <div class="proof-stat">
-      <span class="num">12,000+</span>
-      <span class="label">menus tracked daily</span>
+      <span class="num">All major</span>
+      <span class="label">review sites scanned in one place</span>
+    </div>
+    <div class="proof-stat">
+      <span class="num">$0</span>
+      <span class="label">to start &#8212; free plan, no card needed</span>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     SIGNAL — The "aha" moment. Pure VOC framing.
-     ═══════════════════════════════════════════════════════ -->
+<!-- SIGNAL — The "aha" moment -->
 <section class="signal-section" id="signal">
   <div class="signal-grid">
     <div>
       <p class="section-label">The real question</p>
       <h2 class="section-heading">Are you leaving money<br>on the table?</h2>
-      <p class="section-sub" style="margin-bottom: 20px;">You drove past Tony's place last week and noticed his prices went up. But you've got six other competitors you haven't checked in months. MenuSpy checks them all — every day — so you don't have to.</p>
-      <a href="/features" class="btn-ghost">See all the details →</a>
+      <p class="section-sub" style="margin-bottom: 20px;">You drove past Tony's place last week and noticed his prices went up. But you've got six other competitors you haven't checked in months. MenuSpy checks them all &#8212; every day &#8212; so you don't have to.</p>
+      <a href="/features" class="btn-ghost">See all the details &#8594;</a>
     </div>
     <div class="signal-card">
-      <div class="tag">⚡ Live pricing alert</div>
+      <div class="tag">&#9889; Live pricing alert</div>
       <h3>Your Classic Burger is $1.75 below the neighborhood</h3>
       <div class="price-bar">
         <div class="bar-track"><div class="bar-fill"></div></div>
-        <span class="bar-label">You: $13.50 · Avg: $15.25</span>
+        <span class="bar-label">You: $13.50 &#183; Avg: $15.25</span>
       </div>
       <div style="margin-top: 16px;">
-        <div class="competitor-row"><span class="name">Rooster & Rye</span><span class="price">$18.00</span></div>
+        <div class="competitor-row"><span class="name">Rooster &amp; Rye</span><span class="price">$18.00</span></div>
         <div class="competitor-row"><span class="name">Park Burger Co.</span><span class="price">$16.50</span></div>
         <div class="competitor-row"><span class="name">Local average</span><span class="price">$15.25</span></div>
-        <div class="competitor-row you"><span class="name">★ You</span><span class="price">$13.50</span></div>
+        <div class="competitor-row you"><span class="name">&#9733; You</span><span class="price">$13.50</span></div>
         <div class="competitor-row"><span class="name">Frank's Grill</span><span class="price">$12.00</span></div>
       </div>
-      <p class="signal-nudge">→ Room to raise $1.50–$2.00 without losing a single customer</p>
+      <p class="signal-nudge">&#8594; Room to raise $1.50&#8211;$2.00 without losing a single customer</p>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     FEATURES — Renamed from SaaS-speak to owner-speak.
-     ═══════════════════════════════════════════════════════ -->
+<!-- FEATURES — owner-speak, not SaaS-speak -->
 <section class="features-section">
   <p class="section-label">What you actually get</p>
   <h2 class="section-heading">Tools that answer the questions<br>you're already asking</h2>
@@ -769,41 +748,39 @@
 
   <div class="features-grid">
     <div class="feature-card">
-      <div class="feature-icon">💬</div>
+      <div class="feature-icon">&#x1F4AC;</div>
       <h3>Ask it like you'd ask a partner</h3>
-      <p>"Am I charging too little for wings?" Just type the question. MenuSpy knows your menu, your competitors, and your neighborhood — and gives you a straight answer.</p>
+      <p>"Am I charging too little for wings?" Just type the question. MenuSpy knows your menu, your competitors, and your neighborhood &#8212; and gives you a straight answer.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">💰</div>
+      <div class="feature-icon">&#x1F4B0;</div>
       <h3>See if you're priced right</h3>
-      <p>Are you $2 under on your best seller? $3 over on your slowest mover? See where every item sits compared to the places down the street — no spreadsheet required.</p>
+      <p>Are you $2 under on your best seller? $3 over on your slowest mover? See where every item sits compared to the places down the street &#8212; no spreadsheet required.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">👂</div>
+      <div class="feature-icon">&#x1F442;</div>
       <h3>What guests keep saying<br>(that you're missing)</h3>
-      <p>"People keep complaining about the wait on Yelp." MenuSpy reads every review across every platform and shows you the patterns — what they love and what's hurting your score.</p>
+      <p>"People keep complaining about the wait on Yelp." MenuSpy reads every review across every platform and shows you the patterns &#8212; what they love and what's hurting your score.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">👀</div>
+      <div class="feature-icon">&#x1F440;</div>
       <h3>What's the place down<br>the street charging?</h3>
       <p>New competitor opened up? Old one raised prices? MenuSpy finds nearby restaurants automatically and pulls their menus daily. No more driving around or checking websites.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">🔁</div>
+      <div class="feature-icon">&#x1F501;</div>
       <h3>Turn one-timers into regulars</h3>
-      <p>Snap a photo of your sign-up sheet. Emails captured automatically. Build a loyalty list and send targeted campaigns that bring guests back — without learning new software.</p>
+      <p>Snap a photo of your sign-up sheet. Emails captured automatically. Build a loyalty list and send targeted campaigns that bring guests back &#8212; without learning new software.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon">📊</div>
+      <div class="feature-icon">&#x1F4CA;</div>
       <h3>Your neighborhood, one screen</h3>
       <p>Who raised prices this month? Who's getting better reviews? Where are the gaps you can own? One dashboard. No tabs, no screenshots, no guesswork.</p>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     HOW IT WORKS — 4 steps, plain language.
-     ═══════════════════════════════════════════════════════ -->
+<!-- HOW IT WORKS -->
 <section class="how-section">
   <div class="how-inner">
     <p class="section-label">How it works</p>
@@ -823,7 +800,7 @@
       <div class="step">
         <div class="step-num">3</div>
         <h3>See exactly where you stand</h3>
-        <p>Pricing gaps. Review trends. Who moved their menu this week. Ask the AI anything — it knows your market.</p>
+        <p>Pricing gaps. Review trends. Who moved their menu this week. Ask the AI anything &#8212; it knows your market.</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
@@ -834,18 +811,16 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     BEFORE / AFTER — Pain they've felt → relief they want.
-     ═══════════════════════════════════════════════════════ -->
+<!-- BEFORE / AFTER -->
 <section class="compare-section">
-  <p class="section-label">Before & after</p>
+  <p class="section-label">Before &amp; after</p>
   <h2 class="section-heading">You know this routine. It's time to ditch it.</h2>
   <p class="section-sub" style="margin: 0 auto;">Every owner's done this. The question is why you're still doing it by hand.</p>
   <div class="compare-grid">
     <div class="compare-card old">
-      <h3>😤 The Sunday night ritual</h3>
+      <h3>&#x1F624; The Sunday night ritual</h3>
       <ul>
-        <li>Pull up six competitor websites — half are outdated</li>
+        <li>Pull up six competitor websites &#8212; half are outdated</li>
         <li>Screenshot their menus into a folder you'll never open</li>
         <li>Skim through 200 Yelp reviews and miss the patterns</li>
         <li>Argue with your partner about whether to raise the burger price</li>
@@ -853,9 +828,9 @@
       </ul>
     </div>
     <div class="compare-card new">
-      <h3>🎯 With MenuSpy</h3>
+      <h3>&#x1F3AF; With MenuSpy</h3>
       <ul>
-        <li>Open one dashboard — every competitor's current prices, right there</li>
+        <li>Open one dashboard &#8212; every competitor's current prices, right there</li>
         <li>See "your burger is $1.75 below the neighborhood" in plain English</li>
         <li>Know that 23 reviews this month mention slow service (not food)</li>
         <li>Share a one-page action list with your team on Monday</li>
@@ -865,9 +840,7 @@
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     AI SECTION — Show don't tell, with VOC chat example.
-     ═══════════════════════════════════════════════════════ -->
+<!-- AI SECTION -->
 <section class="ai-section">
   <div class="ai-inner">
     <div>
@@ -888,46 +861,42 @@
       </div>
       <div class="chat-bubble chat-ai">
         <div class="chat-label">MenuSpy</div>
-        Wings range from $14–$19 at 4 places near you. You're at $13.50 — that's 12% below the local average. With your 4.6★ rating and steady traffic, you could move to $15–$16 without losing volume. Rooster & Rye is at $18 and they're packed on Fridays.
+        Wings range from $14&#8211;$19 at 4 places near you. You're at $13.50 &#8212; that's 12% below the local average. With your 4.6&#9733; rating and steady traffic, you could move to $15&#8211;$16 without losing volume. Rooster &amp; Rye is at $18 and they're packed on Fridays.
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     QUESTIONS — The stuff owners actually say out loud.
-     ═══════════════════════════════════════════════════════ -->
+<!-- QUESTIONS — the stuff owners actually say -->
 <section class="questions-section">
   <p class="section-label">Questions MenuSpy answers</p>
   <h2 class="section-heading">The stuff you're already thinking about</h2>
   <div class="questions-grid">
     <div class="question-card">
-      <span class="q-icon">💵</span>
+      <span class="q-icon">&#x1F4B5;</span>
       Am I underpricing my best sellers?
     </div>
     <div class="question-card">
-      <span class="q-icon">🏪</span>
+      <span class="q-icon">&#x1F3EA;</span>
       What are my competitors charging right now?
     </div>
     <div class="question-card">
-      <span class="q-icon">📈</span>
+      <span class="q-icon">&#x1F4C8;</span>
       Who changed their menu this month?
     </div>
     <div class="question-card">
-      <span class="q-icon">🔄</span>
+      <span class="q-icon">&#x1F501;</span>
       How do I get one-timers to come back?
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════════════════════════════════
-     PRICING — ROI framing, not feature comparison.
-     ═══════════════════════════════════════════════════════ -->
+<!-- PRICING — honest, no ROI claims -->
 <section class="pricing-section">
   <div class="pricing-inner">
     <p class="section-label">Pricing</p>
-    <h2 class="section-heading">One price bump usually pays for the whole year.</h2>
-    <p class="section-sub" style="margin: 0 auto;">Start free. See the data. Decide for yourself.</p>
+    <h2 class="section-heading">Start free. Upgrade when it makes sense.</h2>
+    <p class="section-sub" style="margin: 0 auto;">See the data first. Decide for yourself.</p>
     <div class="pricing-pills">
       <div class="pill">
         <div class="tier">Free</div>
@@ -938,7 +907,7 @@
         <div class="price">$39 <span>/mo</span></div>
       </div>
       <div class="pill popular">
-        <div class="tier">Premium ★</div>
+        <div class="tier">Premium &#9733;</div>
         <div class="price">$79 <span>/mo</span></div>
       </div>
       <div class="pill">
@@ -946,21 +915,20 @@
         <div class="price">Custom</div>
       </div>
     </div>
-    <a href="/pricing" class="btn-ghost">Compare plans →</a>
+    <a href="/pricing" class="btn-ghost">Compare plans &#8594;</a>
   </div>
 </section>
 
 <!-- FINAL CTA -->
 <section class="final-cta">
   <h2>Ready to stop wondering?</h2>
-  <p>Your first competitor snapshot takes less than a minute. Free plan lasts forever — upgrade only when the data pays for itself.</p>
-  <a href="/auth?tab=signup" class="btn-primary">Start Free →</a>
-  <p class="note">No credit card required · Cancel anytime</p>
+  <p>Your first competitor snapshot takes less than a minute. Free plan sticks around &#8212; upgrade only when you're ready.</p>
+  <a href="/auth?tab=signup" class="btn-primary">Start Free &#8594;</a>
+  <p class="note">No credit card required &#183; Cancel anytime</p>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <span>© 2026 MenuSpy. All rights reserved.</span>
+  <span>&#169; 2026 MenuSpy. All rights reserved.</span>
   <div class="footer-links">
     <a href="/features">Features</a>
     <a href="/pricing">Pricing</a>
