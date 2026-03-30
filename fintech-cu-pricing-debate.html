@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red-Team: Fintech-CU Matchmaking App — Value-Based Pricing Strategy</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e0;
+    line-height: 1.6;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-bottom: 3px solid #e94560;
+  }
+  .header h1 { font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem; }
+  .header .subtitle { color: #a0a0b0; font-size: 1.1rem; }
+  .header .meta { color: #e94560; font-size: 0.9rem; margin-top: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+  .nav { display: flex; justify-content: center; gap: 0.5rem; padding: 1rem; background: #111; flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
+  .nav button {
+    background: #1a1a2e; color: #a0a0b0; border: 1px solid #333;
+    padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer;
+    font-size: 0.9rem; transition: all 0.2s;
+  }
+  .nav button:hover, .nav button.active { background: #e94560; color: #fff; border-color: #e94560; }
+  .section { display: none; max-width: 960px; margin: 0 auto; padding: 2rem; }
+  .section.active { display: block; }
+  .expert-card {
+    background: #151525; border: 1px solid #252540; border-radius: 10px;
+    padding: 1.5rem; margin-bottom: 1.2rem; border-left: 4px solid var(--accent, #e94560);
+  }
+  .expert-card h3 { color: var(--accent, #e94560); margin-bottom: 0.3rem; }
+  .expert-card .credentials { color: #888; font-size: 0.85rem; margin-bottom: 0.8rem; }
+  .expert-card .lens { color: #ccc; }
+  .round { margin-bottom: 2rem; }
+  .round h2 { color: #e94560; border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+  .critique {
+    background: #151525; border-radius: 8px; padding: 1.5rem;
+    margin-bottom: 1rem; border-left: 4px solid var(--accent, #e94560);
+    position: relative;
+  }
+  .critique .speaker {
+    font-weight: 700; color: var(--accent, #e94560);
+    font-size: 1rem; margin-bottom: 0.5rem;
+  }
+  .critique .style-note { font-style: italic; color: #666; font-size: 0.8rem; margin-bottom: 0.5rem; }
+  .critique blockquote {
+    border-left: 2px solid #444; padding-left: 1rem; margin: 0.8rem 0;
+    color: #bbb; font-style: italic;
+  }
+  .critique p { margin-bottom: 0.6rem; }
+  .vulnerability {
+    background: #1a1020; border: 1px solid #3a2040; border-radius: 8px;
+    padding: 1.2rem; margin-bottom: 1rem;
+  }
+  .vulnerability h4 { margin-bottom: 0.4rem; color: #ddd; }
+  .vulnerability .severity {
+    display: inline-block; padding: 0.2rem 0.6rem; border-radius: 4px;
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .severity.high { background: #e94560; color: #fff; }
+  .severity.medium { background: #f5a623; color: #000; }
+  .severity.low { background: #4ecdc4; color: #000; }
+  .recommendation {
+    background: #102010; border: 1px solid #204020; border-radius: 8px;
+    padding: 1.2rem; margin-bottom: 1rem;
+  }
+  .recommendation h4 { color: #4ecdc4; margin-bottom: 0.4rem; }
+  .confidence-meter {
+    background: #151525; border-radius: 10px; padding: 1.5rem; margin-top: 1.5rem;
+    text-align: center;
+  }
+  .confidence-meter .bar {
+    height: 12px; border-radius: 6px; background: #252540; margin: 1rem auto; max-width: 400px; overflow: hidden;
+  }
+  .confidence-meter .fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #e94560, #f5a623); }
+  .confidence-meter .label { color: #aaa; font-size: 0.9rem; }
+  .confidence-meter .score { font-size: 2rem; font-weight: 700; color: #f5a623; }
+  .verdict {
+    background: #0f1f0f; border: 2px solid #2a4a2a; border-radius: 10px;
+    padding: 2rem; margin-top: 2rem;
+  }
+  .verdict h3 { color: #4ecdc4; font-size: 1.3rem; margin-bottom: 1rem; }
+  .verdict p { margin-bottom: 0.6rem; color: #ccc; }
+  ul { padding-left: 1.5rem; }
+  ul li { margin-bottom: 0.5rem; }
+  .tag {
+    display: inline-block; padding: 0.1rem 0.5rem; border-radius: 3px;
+    font-size: 0.75rem; font-weight: 600; margin-right: 0.3rem;
+  }
+  .tag.pricing { background: #1a2a4a; color: #6aa3d5; }
+  .tag.market { background: #2a1a4a; color: #a06ad5; }
+  .tag.ops { background: #2a2a1a; color: #d5c56a; }
+  .tag.legal { background: #3a1a1a; color: #d56a6a; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="meta">Adversary Debate · 4 Experts · 5 Rounds</div>
+  <h1>Red-Team: Fintech-CU Matchmaking App</h1>
+  <div class="subtitle">Value-Based Pricing Strategy — Manus AI, March 26, 2026</div>
+</div>
+
+<div class="nav">
+  <button class="active" onclick="show('experts')">The Panel</button>
+  <button onclick="show('round1')">Round 1: Comparable Anchors</button>
+  <button onclick="show('round2')">Round 2: Pay-Per-Match</button>
+  <button onclick="show('round3')">Round 3: Annual License</button>
+  <button onclick="show('round4')">Round 4: Pilot Strategy</button>
+  <button onclick="show('round5')">Round 5: Blind Spots</button>
+  <button onclick="show('synthesis')">Synthesis</button>
+</div>
+
+<!-- EXPERTS -->
+<div id="experts" class="section active">
+  <div class="round">
+    <h2>The Adversary Panel</h2>
+
+    <div class="expert-card" style="--accent: #e94560;">
+      <h3>Sandra Voss</h3>
+      <div class="credentials">20 years enterprise B2B SaaS sales · ex-VP Sales at Cvent · quota-carrier perspective</div>
+      <div class="lens">Sandra has closed hundreds of six-figure event-tech deals. She knows exactly what procurement teams look for — and what kills deals before they start. She is deeply allergic to pricing decks that cite competitor prices without a matching credibility stack.</div>
+    </div>
+
+    <div class="expert-card" style="--accent: #f5a623;">
+      <h3>Marcus Lind</h3>
+      <div class="credentials">SaaS pricing strategist · author of <em>Value Metric Traps</em> · 12 years B2B pricing design</div>
+      <div class="lens">Marcus believes most SaaS pricing fails not because it's too high or too low, but because the value metric is misaligned with how buyers actually perceive ROI. He scrutinizes every model for internal coherence before judging the number.</div>
+    </div>
+
+    <div class="expert-card" style="--accent: #4ecdc4;">
+      <h3>Denise Okoro</h3>
+      <div class="credentials">Former NACUSO Board member · Credit Union Association event director · 15 years CU industry</div>
+      <div class="lens">Denise has run matchmaking at national CU conferences and knows the budget realities, internal politics, and procurement cycles that make or break event-tech vendors. She is skeptical of anything that hasn't survived contact with an actual CU compliance team.</div>
+    </div>
+
+    <div class="expert-card" style="--accent: #a06ad5;">
+      <h3>Patrick Ro</h3>
+      <div class="credentials">Seed-stage VC · 40+ fintech investments · thesis: "niche is fine, moat is everything"</div>
+      <div class="lens">Patrick loves niche B2B tools but has been burned by vertical SaaS that never found a repeatable sales motion. He asks one question louder than all others: <em>what stops the biggest player in the room from doing this in a sprint?</em></div>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 1: COMPARABLE ANCHORS -->
+<div id="round1" class="section">
+  <div class="round">
+    <h2>Round 1: The Market Comparable Anchors Are Doing Heavy Lifting They Can't Support</h2>
+
+    <div class="critique" style="--accent: #e94560;">
+      <div class="speaker">Sandra Voss</div>
+      <div class="style-note">Measured. Seen this deck before. Not angry — disappointed.</div>
+      <blockquote>"The app directly delivers multiple [qualified leads]."</blockquote>
+      <p>The $500–$1,450 CPL figure is a general fintech industry benchmark — it applies to demand-gen campaigns targeting CFOs and CTOs at mid-market banks. It does <strong>not</strong> describe the cost of a meeting at a CU conference attended by 30 credit unions with under $500M in assets. The TAM for this specific use case is a rounding error compared to the benchmark's source market. Citing it inflates the perceived value anchor by a factor of 3 to 5.</p>
+      <p>The "$400–$500 per meeting" appointment-setting comparison is equally misleading. Those services deploy <em>human SDRs</em> who qualify, nurture, and confirm attendance. Software automating schedule slots is not the same product. A buyer's procurement team will puncture this in thirty seconds.</p>
+    </div>
+
+    <div class="critique" style="--accent: #f5a623;">
+      <div class="speaker">Marcus Lind</div>
+      <div class="style-note">Precise. Wants to understand the internal logic before judging the price.</div>
+      <blockquote>"Existing B2B matchmaking platforms… often have starting prices ranging from $4,000 to $10,000+ per event."</blockquote>
+      <p>Competitor anchoring only works when you can explain <em>why</em> you're worth a comparable number. b2match and Grip sell to procurement teams with: branded portals, compliance documentation, dedicated customer success, SLA-backed uptime guarantees, multi-event discounts, and years of case studies. The document lists none of these as features. Without them, the competitor anchor creates aspiration without justification — buyers will anchor on the competitor price and then ask for a 70% discount because you're "the same thing but smaller."</p>
+      <p>This is the classic <em>reference class forecasting error</em> in pricing: grouping yourself with established vendors to justify a premium, while ignoring all the table-stakes capabilities those vendors deliver that you don't yet have.</p>
+    </div>
+
+    <div class="critique" style="--accent: #4ecdc4;">
+      <div class="speaker">Denise Okoro</div>
+      <div class="style-note">Practical. Speaking from the buyer's chair.</div>
+      <p>I've sat on both sides of this conversation. When a new vendor walks into my event committee and cites "industry benchmarks" from Belkins.io and DemandNexus, my first thought is: <em>they've never actually sold to a credit union association before.</em> CU associations run on tight margins, member dues, and sponsor relationships that predate the vendor by fifteen years. The pricing conversation doesn't start with ROI math — it starts with "who else have you done this for, and can I call them?"</p>
+      <p>Zero testimonials + premium pricing = dead deal at the first committee vote.</p>
+    </div>
+
+    <div class="critique" style="--accent: #a06ad5;">
+      <div class="speaker">Patrick Ro</div>
+      <div class="style-note">Blunt. Has seen this exact pitch deck twelve times.</div>
+      <p>Comparable-based pricing is a narrative tool, not a valuation tool. Use it in a pitch deck to frame the conversation, fine — but don't mistake it for a pricing strategy. The document's entire Section 4 ("Justification for Premium Pricing") rests on three comparables that don't compare. The <em>actual</em> pricing strategy is: charge what the market will bear, validate with two paying customers, then iterate. The elaborate justification framework is a way of avoiding that uncomfortable first sales conversation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 2: PAY-PER-MATCH -->
+<div id="round2" class="section">
+  <div class="round">
+    <h2>Round 2: The Pay-Per-Match Model Has a Definition Problem That Will Destroy It</h2>
+
+    <div class="critique" style="--accent: #e94560;">
+      <div class="speaker">Sandra Voss</div>
+      <div class="style-note">From experience — she's seen this clause kill relationships.</div>
+      <blockquote>"A fee of $50–$100 per successful, confirmed match."</blockquote>
+      <p>What is a "confirmed match"? The document doesn't define it. Is it an algorithm-generated pairing? A scheduled meeting slot? A meeting that actually occurred? A meeting where both parties showed up for more than five minutes? This ambiguity <strong>will</strong> be weaponized at invoice time. Event organizers have every incentive to dispute matches — it reduces their bill. Without a watertight, contractual definition of what triggers a payment, this model is a collections nightmare dressed up as performance pricing.</p>
+      <p>I've watched three companies go out of business trying to collect on pay-per-performance contracts with event organizers. The buyer always controls the data. Always.</p>
+    </div>
+
+    <div class="critique" style="--accent: #f5a623;">
+      <div class="speaker">Marcus Lind</div>
+      <div class="style-note">Structural analysis. The value metric is off.</div>
+      <p>The deeper problem is that <em>matches</em> is the wrong value metric for the payer. Event organizers don't buy on match count — they buy on sponsor satisfaction and repeat sponsorship rates. A fintech who got 10 meetings with the wrong CUs is not a happy sponsor; they are a churned sponsor. The correct metric alignment would be: charge on <em>sponsor retention</em>, or on <em>sponsor NPS at event close</em>, or simply charge for access to the tool. "Per match" sounds performance-based but actually prices the output of the algorithm, not the outcome the buyer cares about.</p>
+      <p>This mismatch will cause the organizer to optimize for generating matches (easy — lower the threshold) rather than generating quality meetings. You've inadvertently incentivized gaming the metric.</p>
+    </div>
+
+    <div class="critique" style="--accent: #4ecdc4;">
+      <div class="speaker">Denise Okoro</div>
+      <div class="style-note">Operational reality check.</div>
+      <p>The 200-match scenario assumes 20 fintechs each get 10 meetings. At a real regional CU conference, you might have 8–12 fintech sponsors and 25–40 CU attendees. Getting 10 unique meetings per fintech requires CU attendees to sit in back-to-back 30-minute slots all day. That's not networking — that's speed dating with a captive audience. Attendance compliance falls apart by 2pm. The organizer ends up disputing 40 matches because meetings didn't happen. Cash flow realization drops to $6K on a projected $20K deal.</p>
+    </div>
+
+    <div class="critique" style="--accent: #a06ad5;">
+      <div class="speaker">Patrick Ro</div>
+      <div class="style-note">Cash flow warning.</div>
+      <p>Pay-per-performance is a financing instrument, not just a pricing model. You're extending credit to the organizer — you deliver the service, then wait for them to count and pay. With zero funding, every event you run is a receivable. If the organizer takes 60-90 days to reconcile (and they will), you're financing their event operations. Flat fee upfront is strictly better for a bootstrapped product at this stage, even if the total is lower.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 3: ANNUAL LICENSE -->
+<div id="round3" class="section">
+  <div class="round">
+    <h2>Round 3: The White-Label Annual License Is a Year-3 Product Priced as a Day-1 Offering</h2>
+
+    <div class="critique" style="--accent: #e94560;">
+      <div class="speaker">Sandra Voss</div>
+      <div class="style-note">Reading between the lines of "enterprise focus."</div>
+      <blockquote>"Targets larger organizations that host multiple events annually… $20,000–$30,000 annual license."</blockquote>
+      <p>Selling a $20K–$30K annual license to CUNA or NACUSO requires: a formal RFP response, security questionnaire completion, vendor onboarding approval, legal review of the license agreement, and typically a board-level budget approval. That is a 6–18 month sales cycle at minimum. For an app with no case studies, no SOC 2, no dedicated legal support, and no enterprise SLA — this isn't a pricing tier, it's a wish.</p>
+      <p>Even if you somehow land the meeting, the procurement team will ask for enterprise-standard contract language (indemnification, data processing addendum, SLA credits, right to audit) that doesn't exist yet. The deal will die in legal, not in the price negotiation.</p>
+    </div>
+
+    <div class="critique" style="--accent: #4ecdc4;">
+      <div class="speaker">Denise Okoro</div>
+      <div class="style-note">Direct knowledge of CUNA/NACUSO procurement dynamics.</div>
+      <p>CUNA and NACUSO are member-owned associations. Any significant new vendor contract gets political. Individual chapters will ask "why is the association choosing this vendor over our local preferred vendor?" There are pre-existing relationships with Cvent, Whova, and EventMobi that involve co-marketing agreements and member discounts. Walking in with a $25K/year white-label offer, competing against established relationships, with no member references — the committee won't even schedule a demo.</p>
+      <p>The path into associations is through a chapter event success story, not a top-down enterprise pitch.</p>
+    </div>
+
+    <div class="critique" style="--accent: #f5a623;">
+      <div class="speaker">Marcus Lind</div>
+      <div class="style-note">Pricing architecture concern.</div>
+      <p>"White-label" is doing a lot of work in Option C without being defined. Does the organizer get a branded portal? Their own subdomain? Ability to resell to their chapters? Separate data environments per chapter? Custom matching logic? Each of these requires real product investment that isn't described anywhere in the document. The $20K–$30K price tag appears to be reverse-engineered from "what sounds like an enterprise number" rather than derived from what the product actually delivers at that tier.</p>
+    </div>
+
+    <div class="critique" style="--accent: #a06ad5;">
+      <div class="speaker">Patrick Ro</div>
+      <div class="style-note">Sequence-of-operations critique.</div>
+      <p>The document presents three co-equal options when they should be a sequenced roadmap. Option C isn't an alternative pricing model — it's a future-state aspiration that requires two years of Option A case studies to even be credible. Publishing all three simultaneously in a sales deck signals that the vendor doesn't understand their own maturity level, which undermines confidence in Options A and B as well. Kill Option C from the initial pricing deck entirely. Save it for a "where we're going" slide after you've closed three Option A deals.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 4: PILOT STRATEGY -->
+<div id="round4" class="section">
+  <div class="round">
+    <h2>Round 4: The Pilot Discount Strategy Undersells the Risk Transfer to the First Customer</h2>
+
+    <div class="critique" style="--accent: #e94560;">
+      <div class="speaker">Sandra Voss</div>
+      <div class="style-note">The first customer is taking on enormous risk. The deal should reflect that.</div>
+      <blockquote>"A 'Pilot Program Discount' for the first few events (e.g., a reduced fee of $2,500)."</blockquote>
+      <p>A $2,500 "pilot discount" is still $2,500 the organizer is spending on an unproven app at a live event where their sponsor relationships and professional reputation are on the line. If the matchmaking fails — app bugs, algorithm mismatch, poor UX, last-minute schedule chaos — the organizer absorbs all of that pain, plus the awkward conversation with 15 fintech sponsors who paid $5K+ for access to the event.</p>
+      <p>The first three clients deserve equity, advisory roles, or full refund guarantees — not a 50% discount. They're not customers; they're co-developers taking production risk. Price them accordingly, or more importantly, select them as partners rather than buyers.</p>
+    </div>
+
+    <div class="critique" style="--accent: #f5a623;">
+      <div class="speaker">Marcus Lind</div>
+      <div class="style-note">The pilot goal is wrong.</div>
+      <p>The stated goal of the pilot is to "gather performance data and testimonials." But the performance metric described — "95% of Fintech slots filled with Priority 1 & 2 matches" — is an algorithm output metric, not a business outcome metric. A testimonial that says "the app filled 95% of slots" tells a future buyer nothing about whether the fintechs got good meetings, whether sponsors re-contracted, or whether the organizer saved meaningful staff time.</p>
+      <p>Define the pilot success metrics before you price it: sponsor re-contract rate, organizer NPS, staff-hours saved vs. manual process. <em>Those</em> are the testimonials that justify $8,500–$15,000 in subsequent events.</p>
+    </div>
+
+    <div class="critique" style="--accent: #4ecdc4;">
+      <div class="speaker">Denise Okoro</div>
+      <div class="style-note">Practical realism about what pilots actually require.</div>
+      <p>Running a pilot on a live event means the organizer's staff needs to learn a new tool in the middle of pre-event logistics hell. They have 50 other things to manage. The hidden cost of a pilot isn't $2,500 — it's the staff time for onboarding, data import troubleshooting, attendee communication about the new system, and post-event debrief. If the vendor isn't covering that implementation support cost explicitly, the organizer will price it in mentally and the $2,500 feels expensive.</p>
+      <p>Consider making the first pilot truly free, with the vendor providing white-glove implementation. Get your case study. <em>Then</em> charge.</p>
+    </div>
+
+    <div class="critique" style="--accent: #a06ad5;">
+      <div class="speaker">Patrick Ro</div>
+      <div class="style-note">Direct.</div>
+      <p>There's a "vibe coder advantage" framing in Section 6 that I want to push back on. Low internal costs are an advantage in that you can survive low early revenue. They are <strong>not</strong> an advantage in pricing — buyers don't care about your COGS, they care about their risk. Framing "I built this cheap" as a strategic asset is a self-referential argument that doesn't survive contact with a procurement team. Lead with customer value, not founder economics.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ROUND 5: BLIND SPOTS -->
+<div id="round5" class="section">
+  <div class="round">
+    <h2>Round 5: What the Document Doesn't Talk About (And Should)</h2>
+
+    <div class="vulnerability">
+      <h4>Data Ownership and Privacy</h4>
+      <span class="severity high">HIGH</span>
+      <span class="tag legal">legal</span>
+      <p>The app collects fintech company profiles, CU asset sizes, meeting preferences, and potentially contact-level data. Who owns this data? Can the vendor use it to build a proprietary dataset? The document is silent on a data processing addendum, CCPA compliance (CU members may be California consumers), or what happens to data post-event. A single question from a CU compliance officer — "where does our data go after the event?" — with no answer ready will kill the deal.</p>
+    </div>
+
+    <div class="vulnerability">
+      <h4>Competitive Moat: Cvent Can Clone This in a Sprint</h4>
+      <span class="severity high">HIGH</span>
+      <span class="tag market">market</span>
+      <p>Cvent already has a matchmaking module. Whova already has meeting scheduling. The document's moat argument is: (1) niche domain expertise and (2) the Gale-Shapley algorithm. Domain expertise is a person, not a product — it doesn't survive founder departure or poaching. Gale-Shapley is a 1962 algorithm published in an academic paper. It's not IP. The moment this product shows traction, any well-resourced platform adds "fintech-CU matchmaking" as a vertical configuration in their existing product. The real moat is customer lock-in through switching costs — but those require multi-year contracts and deep data integration, which the document doesn't address.</p>
+    </div>
+
+    <div class="vulnerability">
+      <h4>Revenue Concentration Risk</h4>
+      <span class="severity medium">MEDIUM</span>
+      <span class="tag market">market</span>
+      <p>The CU conference market is tiny. There are perhaps 15–20 events per year nationally where this app is relevant. Three associations likely account for 60% of the addressable events. Losing one relationship (new event director hired, competitor relationship formed, budget cut) creates a 20–30% revenue cliff. The document presents no mitigation strategy for this concentration risk.</p>
+    </div>
+
+    <div class="vulnerability">
+      <h4>The Gale-Shapley Algorithm Claim Is Oversold</h4>
+      <span class="severity medium">MEDIUM</span>
+      <span class="tag pricing">pricing</span>
+      <p>"Stable matching" is a mathematical property that means no two participants would both prefer each other over their current match. It does <em>not</em> mean the matches are good, productive, or high-value. A CU matched to its 5th-choice fintech has a "stable" match in the mathematical sense, but that meeting will be low engagement. The document uses "stable" and "mutually beneficial" as synonyms — they're not. This conflation will undermine credibility with any buyer who has a technical team review the claims.</p>
+    </div>
+
+    <div class="vulnerability">
+      <h4>No Failure Mode or Liability Language</h4>
+      <span class="severity medium">MEDIUM</span>
+      <span class="tag legal">legal</span>
+      <p>What happens if the app fails mid-event? What's the refund policy? Is there a backup manual process? The document describes the value of "peace of mind" but provides no contractual backstop if that peace is shattered. Premium pricing in B2B requires a premium risk allocation — buyers paying $8,500+ expect SLA commitments, not a founder promising it'll work.</p>
+    </div>
+
+    <div class="vulnerability">
+      <h4>The Tiered Pricing Table Has Dangerous Gaps</h4>
+      <span class="severity low">LOW</span>
+      <span class="tag pricing">pricing</span>
+      <p>The "Good-Better-Best" table lists Cvent integration as a Professional ($8,500) feature. But Cvent is the dominant platform for exactly the events this app targets. Any organizer already using Cvent will consider integration table-stakes, not a premium. Gating it at $8,500 may mean the majority of target buyers can't use the Standard tier in practice, making the $4,500 entry point a ghost SKU.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SYNTHESIS -->
+<div id="synthesis" class="section">
+  <div class="round">
+    <h2>Synthesis: What the Strategy Gets Right and What Needs Fixing</h2>
+
+    <div class="recommendation">
+      <h4>Keep: Value-based framing over cost-plus</h4>
+      <p>Correct instinct. A tool that saves 40 hours of manual scheduling and increases sponsor satisfaction has real, measurable value that far exceeds development cost. Don't abandon value-based pricing — just ground it in <em>customer-validated</em> value metrics, not industry CPL benchmarks.</p>
+    </div>
+
+    <div class="recommendation">
+      <h4>Keep: The tiered structure (with fixes)</h4>
+      <p>Good-Better-Best is the right architecture for this market. Revise it: move Cvent integration to Standard (it's a requirement, not a differentiator), and make Professional's premium about analytics and white-glove onboarding support. The current table gates necessity behind price.</p>
+    </div>
+
+    <div class="recommendation">
+      <h4>Fix: Replace Pay-Per-Match with Pay-Per-Event + Performance Bonus</h4>
+      <p>Charge a flat fee upfront (removes collection risk), then add an optional performance bonus tied to a verifiable, contractually-defined metric (e.g., "sponsor re-registration rate within 30 days of event"). This preserves the performance-based incentive alignment while protecting cash flow.</p>
+    </div>
+
+    <div class="recommendation">
+      <h4>Fix: Remove Option C from the launch deck entirely</h4>
+      <p>Publish it internally as a Year 2 roadmap item. Including it now signals premature scope and dilutes the credibility of Options A and B.</p>
+    </div>
+
+    <div class="recommendation">
+      <h4>Fix: Reframe the pilot — make it truly free with full implementation support</h4>
+      <p>Three free pilots with white-glove service. Define success metrics in advance (sponsor NPS, re-contract rate, staff-hours saved). The case studies generated are worth $50K+ in sales collateral. This is an investment, not a discount.</p>
+    </div>
+
+    <div class="recommendation">
+      <h4>Fix: Address data ownership and liability before first sale</h4>
+      <p>Draft a one-page data processing addendum and a basic SLA before approaching any buyer. These are table-stakes at $5K+. Without them, you're leaving deals on the table in legal review.</p>
+    </div>
+
+    <div class="recommendation">
+      <h4>Fix: Replace market comparable anchors with ROI calculator</h4>
+      <p>Build a simple ROI calculator: "If your event has 15 fintechs, each spending $5K on sponsorship, and this tool increases their renewal rate by 20%, that's $15K in incremental sponsor revenue — for $8,500 in software." Customer-specific math beats industry benchmarks every time.</p>
+    </div>
+  </div>
+
+  <div class="confidence-meter">
+    <div class="label">Panel Confidence: Strategy is Directionally Correct but Operationally Premature</div>
+    <div class="score">58 / 100</div>
+    <div class="bar"><div class="fill" style="width: 58%;"></div></div>
+    <div class="label">Strong value-based instinct · Weak execution scaffolding · High potential after first two paying customers</div>
+  </div>
+
+  <div class="verdict">
+    <h3>Final Verdict</h3>
+    <p>The pricing strategy is built on a sound premise — the app delivers real, quantifiable value in a market where buyers have historically overpaid for inferior solutions. The directional instinct to charge $5K–$15K per event is defensible.</p>
+    <p>The execution scaffolding, however, is not ready for a $15K close. The comparable anchors won't survive procurement scrutiny. The pay-per-match model has a definitions problem that will generate disputes. The annual license tier is aspirational cosplay at this stage. And the three blind spots that could kill deals — data ownership, competitive moat, and the absence of any failure-mode language — are entirely absent from the document.</p>
+    <p><strong>The play:</strong> Run three free pilots with contractually-defined success metrics. Build one tight ROI calculator. Draft a DPA and a basic SLA. Charge $6,500 for your first paid event using a flat fee with refund guarantee. Get two re-contracts. Then you have everything you need to justify $12K–$15K — and you can actually defend it.</p>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
